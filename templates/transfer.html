@@ -1,0 +1,26 @@
+{% extends "base.html" %} {% block content %}
+<h2>
+  Transfer Funds
+  <span class="vuln-badge">A04: No balance check, no rate limit</span>
+</h2>
+<div class="card" style="max-width: 480px">
+  {% if msg %}
+  <div class="success">{{ msg }}</div>
+  {% endif %}
+  <form method="POST">
+    <label style="font-size: 13px"
+      >Amount (try negative values or huge numbers)</label
+    >
+    <input
+      name="amount"
+      type="number"
+      step="any"
+      placeholder="Amount"
+      required
+    />
+    <label style="font-size: 13px">To Account ID</label>
+    <input name="to_account" type="number" placeholder="Account ID" required />
+    <button class="btn" type="submit">Transfer</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %} {% block content %}
+<h2>
+  Your Accounts
+  <span class="vuln-badge"
+    >A01: IDOR — try /account/1, /account/2, /account/3</span
+  >
+</h2>
+{% for acc in accounts %}
+<div class="card">
+  <strong>Account #{{ acc.id }}</strong> — Balance: ${{
+  "%.2f"|format(acc.balance) }}
+  <a
+    href="/account/{{ acc.id }}"
+    style="font-size: 13px; margin-left: 12px; color: #888"
+    >View details</a
+  >
+</div>
+{% endfor %} {% if txns %}
+<h3>Transactions</h3>
+<div class="card">
+  <table>
+    <tr>
+      <th>From</th>
+      <th>To</th>
+      <th>Amount</th>
+      <th>Time</th>
+    </tr>
+    {% for t in txns %}
+    <tr>
+      <td>#{{ t.from_account }}</td>
+      <td>#{{ t.to_account }}</td>
+      <td>${{ t.amount }}</td>
+      <td>{{ t.timestamp }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %} {% endblock %}

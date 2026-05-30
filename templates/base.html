@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>VulnBank</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 860px;
+        margin: 40px auto;
+        padding: 0 20px;
+        background: #f5f5f5;
+      }
+      nav {
+        background: #1a1a2e;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+      nav a {
+        color: #aaa;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      nav a:hover {
+        color: white;
+      }
+      nav .brand {
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+        margin-right: auto;
+      }
+      .card {
+        background: white;
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 16px;
+        border: 1px solid #e0e0e0;
+      }
+      .btn {
+        background: #1a1a2e;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .btn:hover {
+        background: #16213e;
+      }
+      input,
+      select {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 14px;
+        width: 100%;
+        margin-bottom: 12px;
+        box-sizing: border-box;
+      }
+      .error {
+        color: #c0392b;
+        background: #fdecea;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+      }
+      .success {
+        color: #27ae60;
+        background: #eafaf1;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th {
+        text-align: left;
+        padding: 8px;
+        background: #f0f0f0;
+      }
+      td {
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+      }
+      .vuln-badge {
+        background: #fdecea;
+        color: #c0392b;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    {% if session.user_id %}
+    <nav>
+      <span class="brand">VulnBank</span>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/transfer">Transfer</a>
+      <a href="/import">Import</a>
+      <a href="/admin">Admin</a>
+      <a href="/logout">Logout ({{ session.username }})</a>
+    </nav>
+    {% endif %} {% block content %}{% endblock %}
+  </body>
+</html>

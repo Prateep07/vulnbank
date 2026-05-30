@@ -1,0 +1,29 @@
+{% extends "base.html" %} {% block content %}
+<h2>
+  Import Bank Statement
+  <span class="vuln-badge">A10: SSRF — try internal URLs</span>
+</h2>
+<div class="card" style="max-width: 560px">
+  <form method="POST">
+    <label style="font-size: 13px"
+      >Statement URL (e.g. try: http://localhost:5000/admin)</label
+    >
+    <input name="url" placeholder="https://..." required />
+    <button class="btn" type="submit">Fetch</button>
+  </form>
+  {% if result %}
+  <hr />
+  <pre
+    style="
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      overflow-x: auto;
+    "
+  >
+{{ result }}</pre
+  >
+  {% endif %}
+</div>
+{% endblock %}
