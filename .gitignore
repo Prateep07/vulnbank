@@ -36,3 +36,29 @@ Thumbs.db
 .pytest_cache/
 htmlcov/
 .coverage
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+
+# --- Virtual environments ---
+mcp_venv/
+mcp_server/venv/
+mcp_server/.venv/
+
+# --- uv (if used) ---
+uv.lock
+
+# --- Databases (don't commit the actual runtime DB) ---
+*.db
+*.sqlite3
+
+# --- OS / editor junk ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Env files (if you ever add secrets/config) ---
+.env
