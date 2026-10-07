@@ -3,6 +3,15 @@ import sys
 from pathlib import Path
 import httpx
 
+
+import functools
+import os
+from typing import Optional
+from dotenv import load_dotenv
+from pydantic import BaseModel
+
+load_dotenv(Path(__file__).resolve().parent / ".env")
+
 try:    
     from mcp.server.fastmcp import FastMCP
 except ModuleNotFoundError:
@@ -14,7 +23,38 @@ EXPLOITS_DIR = VULNBANK_REPO_PATH / "exploits"
 mcp = FastMCP("vulnbank-mcp")
 client = httpx.Client(base_url=VULNBANK_BASE_URL, follow_redirects=True, timeout=10)
 
+API_KEY = os.environ.get("VULNBANK_MCP_API_KEY")
+_session = {"authenticated": False}
+
+
+class AuthResult(BaseModel):
+    authenticated: bool
+    error: Optional[str] = None
+
+
+def require_auth(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        if not _session["authenticated"]:
+            raise PermissionError(
+                "Not authenticated. Call authenticate(api_key=...) first."
+            )
+        return func(*args, **kwargs)
+    return wrapper
+
 @mcp.tool()
+def authenticate(api_key: str) -> AuthResult:
+    if API_KEY is None:
+        return AuthResult(authenticated=False, error="Server has no VULNBANK_MCP_API_KEY configured.")
+    if api_key == API_KEY:
+        _session["authenticated"] = True
+        return AuthResult(authenticated=True)
+    return AuthResult(authenticated=False, error="Invalid API key.")
+
+
+
+@mcp.tool()
+@require_auth
 def list_vulnerabilities():
     return [
         {"id": "A01", "name": "Broken Access Control"},
@@ -30,6 +70,7 @@ def list_vulnerabilities():
     ]
 
 @mcp.tool()
+@require_auth
 def login(username: str, password: str) -> dict:
     resp = client.post("/login", data={"username": username, "password": password})
     logged_in = "login" not in resp.url.path
@@ -37,38 +78,37 @@ def login(username: str, password: str) -> dict:
 
 
 @mcp.tool()
+@require_auth
 def get_dashboard() -> dict:
     resp = client.get("/dashboard")
     return {"status_code": resp.status_code, "body": resp.text[:3000]}
 
 @mcp.tool()
+@require_auth
 def get_account(account_id: int) -> dict:
     resp = client.get(f"/account/{account_id}")
     return {"status_code": resp.status_code, "body": resp.text[:3000]}
 
 @mcp.tool()
+@require_auth
 def transfer_funds(to_account: int, amount: float) -> dict:
     resp = client.post("/transfer", data={"to_account": to_account, "amount": amount})
     return {"status_code": resp.status_code, "body": resp.text[:1000]}
 
 
 @mcp.tool()
+@require_auth
 def get_admin_panel() -> dict:
     resp = client.get("/admin")
     return {"status_code": resp.status_code, "body": resp.text[:3000]}
 
 ALLOWED_EXPLOITS = {
-    "01_sqli",
-    "02_idor",
-    "03_bruteforce",
-    "04_logic_flaw",
-    "05_misconfig",
-    "06_pickle_rce",
-    "07_ssrf",
-    "08_crack_hashes",
+    "01_sqli", "02_idor", "03_bruteforce", "04_logic_flaw",
+    "05_misconfig", "06_pickle_rce", "07_ssrf", "08_crack_hashes",
 }
 
 @mcp.tool()
+@require_auth
 def run_exploit(name: str) -> dict:
     """01_sqli, 02_idor, 03_bruteforce,
     04_logic_flaw, 05_misconfig, 06_pickle_rce, 07_ssrf,

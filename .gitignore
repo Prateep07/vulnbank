@@ -10,6 +10,7 @@ venv/
 .venv/
 env/
 
+
 # --- uv ---
 # (uv.lock is intentionally NOT ignored — it pins exact dependency
 # versions for anyone else who clones this repo)
