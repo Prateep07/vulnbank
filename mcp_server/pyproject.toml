@@ -1,8 +1,12 @@
 [project]
-name = "vulnbank-mcp-server"
+name = "vulnbank-mcp"
 version = "0.1.0"
-requires-python = ">=3.11"
+description = "NitroStack MCP server for VulnBank"
+requires-python = ">=3.10"
+
 dependencies = [
-    "mcp[cli]>=2.3.0",
+    "nitrostack",
     "httpx",
+    "python-dotenv",
+    "pydantic>=2"
 ]
