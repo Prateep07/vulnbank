@@ -1,64 +1,83 @@
-# Python
+# --- Python ---
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 .Python
 
-# Virtual environment
+# --- Virtual environments ---
 venv/
+.venv/
 env/
-.env/
 
-# Database (contains real user data — never commit this)
+# --- uv ---
+# (uv.lock is intentionally NOT ignored — it pins exact dependency
+# versions for anyone else who clones this repo)
+
+# --- Databases (contains data — never commit) ---
 *.db
 *.sqlite
 *.sqlite3
 
-# Environment variables (contains secrets)
+# --- Environment / secrets ---
 .env
 .env.*
 
-# Flask session files
+# --- Flask ---
 flask_session/
-
-# OS junk
-.DS_Store
-Thumbs.db
-
-# Editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Pytest / coverage
-.pytest_cache/
-htmlcov/
-.coverage
-
-# --- Python ---
-__pycache__/
-*.pyc
-*.pyo
-
-# --- Virtual environments ---
-mcp_venv/
-mcp_server/venv/
-mcp_server/.venv/
-
-# --- uv (if used) ---
-uv.lock
-
-# --- Databases (don't commit the actual runtime DB) ---
-*.db
-*.sqlite3
 
 # --- OS / editor junk ---
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# --- Env files (if you ever add secrets/config) ---
+# --- Testing / coverage ---
+.pytest_cache/
+htmlcov/
+.coverage
+EOF
+Output
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# --- Virtual environments ---
+venv/
+.venv/
+env/
+
+# --- uv ---
+# (uv.lock is intentionally NOT ignored — it pins exact dependency
+# versions for anyone else who clones this repo)
+
+# --- Databases (contains data — never commit) ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Environment / secrets ---
 .env
+.env.*
+
+# --- Flask ---
+flask_session/
+
+# --- OS / editor junk ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Testing / coverage ---
+.pytest_cache/
+htmlcov/
+.coverage

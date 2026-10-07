@@ -4,9 +4,9 @@ from pathlib import Path
 import httpx
 
 try:    
-    from mcp.server.fastmcp import FastMCP  # mcp < 2.0
+    from mcp.server.fastmcp import FastMCP
 except ModuleNotFoundError:
-    from mcp.server.mcpserver import MCPServer as FastMCP  # mcp >= 2.0
+    from mcp.server.mcpserver import MCPServer as FastMCP  
 
 VULNBANK_BASE_URL = "http://localhost:5000"
 VULNBANK_REPO_PATH = Path(__file__).resolve().parent.parent
@@ -17,16 +17,16 @@ client = httpx.Client(base_url=VULNBANK_BASE_URL, follow_redirects=True, timeout
 @mcp.tool()
 def list_vulnerabilities():
     return [
-        "Broken Access Control",
-        "Cryptographic Failures",
-        "SQL Injection",
-        "Insecure Design",
-        "Security Misconfiguration",
-        "Vulnerable Components",
-        "Authentication Failures",
-        "Insecure Deserialization",
-        "Logging Failures",
-        "SSRF"
+        {"id": "A01", "name": "Broken Access Control"},
+        {"id": "A02", "name": "Cryptographic Failures"},
+        {"id": "A03", "name": "SQL Injection"},
+        {"id": "A04", "name": "Insecure Design"},
+        {"id": "A05", "name": "Security Misconfiguration"},
+        {"id": "A06", "name": "Vulnerable Components"},
+        {"id": "A07", "name": "Authentication Failures"},
+        {"id": "A08", "name": "Insecure Deserialization"},
+        {"id": "A09", "name": "Logging Failures"},
+        {"id": "A10", "name": "SSRF"},
     ]
 
 @mcp.tool()
@@ -92,6 +92,41 @@ def run_exploit(name: str) -> dict:
         "stdout": result.stdout,
         "stderr": result.stderr,
     }
+
+@mcp.resource("vulnbank://readme")
+def get_readme() -> str:
+    path = VULNBANK_REPO_PATH / "README.md"
+    if not path.exists():
+        return "No README.md found in the repo."
+    return path.read_text()
+
+
+@mcp.resource("writeup://{vuln_id}")
+def get_writeup(vuln_id: str) -> str:
+    """Return the markdown writeup for a given vulnerability ID
+    (e.g. 'A01', 'A03'). See list_vulnerabilities for valid IDs.
+    Note: A06 and A09 have no writeup file in the repo.
+    """
+    writeups_dir = VULNBANK_REPO_PATH / "writeups"
+    if not writeups_dir.exists():
+        return f"No writeups/ folder found at {writeups_dir}"
+
+    matches = list(writeups_dir.glob(f"{vuln_id}_*.md"))
+    if not matches:
+        return f"No writeup found for {vuln_id} in {writeups_dir} (A06 and A09 have none)"
+    return matches[0].read_text()
+
+@mcp.prompt()
+def explain_vulnerability(owasp_id: str) -> str:
+    """Build a prompt asking the model to explain and fix a given
+    OWASP category, using this server's own tools as evidence."""
+    return (
+        f"Explain how the {owasp_id} vulnerability works in VulnBank. "
+        f"Use run_exploit to demonstrate it if a matching script exists, "
+        f"then propose a concrete code fix for app.py."
+    )
+
+
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")
