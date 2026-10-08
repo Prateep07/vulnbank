@@ -4,9 +4,12 @@ from nitrostack import (
     ExecutionContext,
     injectable,
     tool,
+    use_interceptors,
+    widget,
 )
 
 from .exploit_service import ExploitService
+from .interceptors import LoggingInterceptor
 from .service import VulnBankService
 
 
@@ -64,6 +67,7 @@ class VulnBankTools:
         description="Authenticate with the VulnBank MCP server",
         input_schema=AuthenticateInput
     )
+    @use_interceptors(LoggingInterceptor)
     async def authenticate(
         self,
         input: AuthenticateInput,
@@ -79,15 +83,17 @@ class VulnBankTools:
         description="List the OWASP vulnerabilities available in VulnBank",
         input_schema=EmptyInput
     )
+    @widget("vuln-list")
+    @use_interceptors(LoggingInterceptor)
     async def list_vulnerabilities(
         self,
         input: EmptyInput,
         context: ExecutionContext
-    ) -> list:
+    ) -> dict:
 
         self.service.require_auth()
 
-        return [
+        vulnerabilities = [
             {
                 "id": "A01",
                 "name": "Broken Access Control"
@@ -130,11 +136,17 @@ class VulnBankTools:
             }
         ]
 
+        return {
+            "vulnerabilities": vulnerabilities,
+            "total": len(vulnerabilities)
+        }
+
     @tool(
         name="login",
         description="Login to the VulnBank application",
         input_schema=LoginInput
     )
+    @use_interceptors(LoggingInterceptor)
     async def login(
         self,
         input: LoginInput,
@@ -151,6 +163,7 @@ class VulnBankTools:
         description="Retrieve the VulnBank dashboard",
         input_schema=EmptyInput
     )
+    @use_interceptors(LoggingInterceptor)
     async def get_dashboard(
         self,
         input: EmptyInput,
@@ -164,6 +177,7 @@ class VulnBankTools:
         description="Retrieve a VulnBank account by account ID",
         input_schema=AccountInput
     )
+    @use_interceptors(LoggingInterceptor)
     async def get_account(
         self,
         input: AccountInput,
@@ -179,6 +193,7 @@ class VulnBankTools:
         description="Transfer funds between VulnBank accounts",
         input_schema=TransferInput
     )
+    @use_interceptors(LoggingInterceptor)
     async def transfer_funds(
         self,
         input: TransferInput,
@@ -195,6 +210,7 @@ class VulnBankTools:
         description="Retrieve the VulnBank admin panel",
         input_schema=EmptyInput
     )
+    @use_interceptors(LoggingInterceptor)
     async def get_admin_panel(
         self,
         input: EmptyInput,
@@ -206,8 +222,10 @@ class VulnBankTools:
     @tool(
         name="run_exploit",
         description="Run an authorized VulnBank security lab exploit",
-        input_schema=RunExploitInput
+        input_schema=RunExploitInput,
+        task_support="optional",
     )
+    @use_interceptors(LoggingInterceptor)
     async def run_exploit(
         self,
         input: RunExploitInput,
@@ -216,6 +234,11 @@ class VulnBankTools:
 
         self.service.require_auth()
 
-        return self.exploit_service.run(
-            input.name
+        def on_progress(line: str) -> None:
+            if context.task:
+                context.task.update_progress(line)
+
+        return await self.exploit_service.run(
+            input.name,
+            on_progress=on_progress,
         )
