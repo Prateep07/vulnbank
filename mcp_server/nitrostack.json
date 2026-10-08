@@ -1,0 +1,4 @@
+{
+  "runtime": "python",
+  "entrypoint": "main.py"
+}
