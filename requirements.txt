@@ -1,0 +1,4 @@
+nitrostack==0.4.0
+httpx==0.28.1
+python-dotenv
+pydantic>=2,<3
